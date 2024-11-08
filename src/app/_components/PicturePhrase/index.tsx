@@ -14,13 +14,27 @@ export default function PicturePhrase() {
     top: 50,
     left: 50,
   });
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 600,
+    height: 400,
+  });
+
+  const previewWidth = 600; // Fixed preview width
+  const previewHeight = 400; // Fixed preview height
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setOriginalImage(imageUrl);
-      await setupImage(imageUrl);
+
+      // Set up the image dimensions based on the uploaded image
+      const img = new window.Image();
+      img.src = imageUrl;
+      img.onload = async () => {
+        setImageDimensions({ width: img.width, height: img.height });
+        await setupImage(imageUrl);
+      };
     }
   };
 
@@ -29,7 +43,6 @@ export default function PicturePhrase() {
       const imageBlob = await removeBackground(imageUrl);
       const url = URL.createObjectURL(imageBlob);
       setProcessedImage(url);
-      console.log("ye hai processed image: ", url);
     } catch (error) {
       console.error(error);
     }
@@ -40,12 +53,44 @@ export default function PicturePhrase() {
   };
 
   const handleDownload = async () => {
-    const element = document.getElementById("preview");
-    const canvas = await html2canvas(element);
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = "customized-image.png";
-    link.click();
+    const offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.width = imageDimensions.width;
+    offscreenCanvas.height = imageDimensions.height;
+    const ctx = offscreenCanvas.getContext("2d");
+
+    const imageElement = new window.Image();
+    imageElement.src = originalImage;
+
+    imageElement.onload = () => {
+      // Draw the original image
+      ctx.drawImage(
+        imageElement,
+        0,
+        0,
+        imageDimensions.width,
+        imageDimensions.height,
+      );
+
+      // Calculate scale factors
+      const scaleX = imageDimensions.width / previewWidth;
+      const scaleY = imageDimensions.height / previewHeight;
+
+      // Draw the text on the image with scaling applied
+      ctx.font = `${textSettings.size * scaleX}px Arial`;
+      ctx.fillStyle = textSettings.color;
+      ctx.textAlign = "center";
+      ctx.fillText(
+        text,
+        (textSettings.left / 100) * imageDimensions.width,
+        (textSettings.top / 100) * imageDimensions.height,
+      );
+
+      // Convert canvas to an image and trigger download
+      const link = document.createElement("a");
+      link.href = offscreenCanvas.toDataURL("image/png");
+      link.download = "customized-image.png";
+      link.click();
+    };
   };
 
   return (
@@ -58,7 +103,11 @@ export default function PicturePhrase() {
         {/* Image Preview Section */}
         <div
           id="preview"
-          className="relative h-[600px] w-3/5 overflow-hidden border border-gray-300 bg-gray-100"
+          className="relative overflow-hidden border border-gray-300 bg-gray-100"
+          style={{
+            width: `${previewWidth}px`, // Fixed width for consistency
+            height: `${previewHeight}px`, // Fixed height for consistency
+          }}
         >
           {originalImage && (
             <Image
@@ -88,7 +137,7 @@ export default function PicturePhrase() {
               alt="Subject with Background Removed"
               className="absolute left-0 top-0 z-10 object-contain"
               style={{ opacity: 1 }}
-              fill // This allows the image to fill the container while maintaining responsive scaling
+              fill
             />
           )}
         </div>
