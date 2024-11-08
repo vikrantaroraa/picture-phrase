@@ -1,25 +1,37 @@
 "use client";
 import { useState } from "react";
 import html2canvas from "html2canvas";
+import { removeBackground } from "@imgly/background-removal";
+import Image from "next/image";
 
 export default function PicturePhrase() {
-  const [image, setImage] = useState(null);
+  const [originalImage, setOriginalImage] = useState(null);
+  const [processedImage, setProcessedImage] = useState(null);
   const [text, setText] = useState("Your Text Here");
   const [textSettings, setTextSettings] = useState({
     size: 30,
-    color: "#000000",
-    opacity: 1,
-    fontWeight: "normal",
+    color: "#FFFFFF",
     top: 50,
     left: 50,
   });
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setImage(reader.result);
-      reader.readAsDataURL(file);
+      const imageUrl = URL.createObjectURL(file);
+      setOriginalImage(imageUrl);
+      await setupImage(imageUrl);
+    }
+  };
+
+  const setupImage = async (imageUrl: string) => {
+    try {
+      const imageBlob = await removeBackground(imageUrl);
+      const url = URL.createObjectURL(imageBlob);
+      setProcessedImage(url);
+      console.log("ye hai processed image: ", url);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -38,7 +50,9 @@ export default function PicturePhrase() {
 
   return (
     <div className="flex flex-col items-center p-6">
-      <h1 className="mb-6 text-3xl font-semibold">PicturePhrase</h1>
+      <h1 className="mb-6 text-3xl font-semibold">
+        PicturePhrase - Text Behind Image
+      </h1>
 
       <div className="flex w-full max-w-6xl gap-10">
         {/* Image Preview Section */}
@@ -46,26 +60,37 @@ export default function PicturePhrase() {
           id="preview"
           className="relative h-[600px] w-3/5 overflow-hidden border border-gray-300 bg-gray-100"
         >
-          {image && (
-            <img
-              src={image}
-              alt="Uploaded"
-              className="h-full w-full object-cover"
+          {originalImage && (
+            <Image
+              src={originalImage}
+              alt="Original"
+              className="absolute left-0 top-0 z-0 object-contain"
+              style={{ opacity: 1 }}
+              fill
             />
           )}
+          {/* Text Layer - Behind Processed Image */}
           <div
             style={{
               top: `${textSettings.top}%`,
               left: `${textSettings.left}%`,
               fontSize: `${textSettings.size}px`,
               color: textSettings.color,
-              opacity: textSettings.opacity,
-              fontWeight: textSettings.fontWeight,
             }}
-            className="absolute -translate-x-1/2 -translate-y-1/2 transform whitespace-pre-wrap text-center"
+            className="absolute z-0 -translate-x-1/2 -translate-y-1/2 transform whitespace-pre-wrap text-center"
           >
             {text}
           </div>
+          {/* Render Processed Image */}
+          {processedImage && (
+            <Image
+              src={processedImage}
+              alt="Subject with Background Removed"
+              className="absolute left-0 top-0 z-10 object-contain"
+              style={{ opacity: 1 }}
+              fill // This allows the image to fill the container while maintaining responsive scaling
+            />
+          )}
         </div>
 
         {/* Customization Panel */}
@@ -92,8 +117,9 @@ export default function PicturePhrase() {
             <label className="font-semibold">Font Size</label>
             <input
               type="range"
-              min="10"
-              max="100"
+              min={10}
+              max={500}
+              step={1}
               value={textSettings.size}
               onChange={(e) => handleTextSettingChange("size", e.target.value)}
               className="mt-2 w-full"
@@ -108,36 +134,6 @@ export default function PicturePhrase() {
               onChange={(e) => handleTextSettingChange("color", e.target.value)}
               className="mt-2 block w-12 border p-[2px]"
             />
-          </div>
-
-          <div>
-            <label className="font-semibold">Opacity</label>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={textSettings.opacity}
-              onChange={(e) =>
-                handleTextSettingChange("opacity", e.target.value)
-              }
-              className="mt-2 w-full"
-            />
-          </div>
-
-          <div>
-            <label className="font-semibold">Font Weight</label>
-            <select
-              value={textSettings.fontWeight}
-              onChange={(e) =>
-                handleTextSettingChange("fontWeight", e.target.value)
-              }
-              className="mt-2 block w-full rounded border p-2"
-            >
-              <option value="normal">Normal</option>
-              <option value="bold">Bold</option>
-              <option value="lighter">Lighter</option>
-            </select>
           </div>
 
           <div>

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.6.0",
+    "@imgly/background-removal": "^1.5.5",
     "@planetscale/database": "^1.19.0",
     "@prisma/adapter-planetscale": "^5.14.0",
     "@prisma/client": "^5.14.0",
