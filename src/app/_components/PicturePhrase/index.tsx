@@ -733,20 +733,20 @@ export default function PicturePhrase() {
     offscreenCanvas.height = imageDimensions.height;
     const ctx = offscreenCanvas.getContext("2d");
 
-    const imageElement = new window.Image();
-    imageElement.src = originalImage;
+    const originalImageElement = new window.Image();
+    originalImageElement.src = originalImage;
 
-    imageElement.onload = () => {
-      // Draw the original image
+    originalImageElement.onload = () => {
+      // Draw the original image first (bottom layer)
       ctx.drawImage(
-        imageElement,
+        originalImageElement,
         0,
         0,
         imageDimensions.width,
         imageDimensions.height,
       );
 
-      // Add text over the image
+      // Add text on top of original image (middle layer)
       ctx.font = `${textSettings.size}px Arial`;
       ctx.fillStyle = textSettings.color;
       ctx.textAlign = "center";
@@ -756,10 +756,32 @@ export default function PicturePhrase() {
         (textSettings.top / 100) * imageDimensions.height,
       );
 
-      const link = document.createElement("a");
-      link.href = offscreenCanvas.toDataURL("image/png");
-      link.download = "customized-image.png";
-      link.click();
+      // If processed image exists, draw it last (top layer)
+      if (processedImage) {
+        const processedImageElement = new window.Image();
+        processedImageElement.src = processedImage;
+        processedImageElement.onload = () => {
+          ctx.drawImage(
+            processedImageElement,
+            0,
+            0,
+            imageDimensions.width,
+            imageDimensions.height,
+          );
+
+          // Create download link
+          const link = document.createElement("a");
+          link.href = offscreenCanvas.toDataURL("image/png");
+          link.download = "customized-image.png";
+          link.click();
+        };
+      } else {
+        // Create download link if no processed image
+        const link = document.createElement("a");
+        link.href = offscreenCanvas.toDataURL("image/png");
+        link.download = "customized-image.png";
+        link.click();
+      }
     };
   };
 
