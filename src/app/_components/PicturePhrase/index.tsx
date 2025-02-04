@@ -20,6 +20,11 @@ import {
   Press_Start_2P,
   Fredoka,
   Sacramento,
+  Inter,
+  Roboto,
+  Playfair_Display,
+  Oswald,
+  Dancing_Script,
 } from "next/font/google";
 
 // Initialize fonts
@@ -41,6 +46,11 @@ const greatVibes = Great_Vibes({ weight: "400", subsets: ["latin"] });
 const pressStart2P = Press_Start_2P({ weight: "400", subsets: ["latin"] });
 const fredoka = Fredoka({ subsets: ["latin"] });
 const sacramento = Sacramento({ weight: "400", subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({ weight: ["400", "700"], subsets: ["latin"] });
+const playfair = Playfair_Display({ subsets: ["latin"] });
+const oswald = Oswald({ subsets: ["latin"] });
+const dancingScript = Dancing_Script({ subsets: ["latin"] });
 
 const fontOptions = [
   { name: "Merriweather", font: merriweather }, // Elegant serif
@@ -58,6 +68,11 @@ const fontOptions = [
   { name: "Press Start 2P", font: pressStart2P }, // 8-bit pixel
   { name: "Fredoka", font: fredoka }, // Friendly rounded
   { name: "Sacramento", font: sacramento }, // Delicate script
+  { name: "Inter", font: inter },
+  { name: "Roboto", font: roboto },
+  { name: "Playfair Display", font: playfair },
+  { name: "Oswald", font: oswald },
+  { name: "Dancing Script", font: dancingScript },
 ];
 
 export default function PicturePhrase() {
@@ -310,7 +325,7 @@ export default function PicturePhrase() {
     const originalImageElement = new window.Image();
     originalImageElement.src = originalImage;
 
-    originalImageElement.onload = () => {
+    originalImageElement.onload = async () => {
       ctx.drawImage(
         originalImageElement,
         0,
@@ -325,9 +340,9 @@ export default function PicturePhrase() {
       const selectedFont = fontOptions.find(
         (f) => f.name === textSettings.fontFamily,
       );
-      ctx.font = `${scaledFontSize}px ${selectedFont ? selectedFont.name : "Arial"}`;
+      const fontFamily = selectedFont.font.style.fontFamily;
 
-      ctx.font = `${scaledFontSize}px Arial`;
+      ctx.font = `${scaledFontSize}px ${selectedFont ? fontFamily : "Arial"}`;
       ctx.fillStyle = textSettings.color;
       ctx.globalAlpha = textSettings.opacity / 100; // Add opacity to canvas
       ctx.textBaseline = "middle";
