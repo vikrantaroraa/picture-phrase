@@ -264,6 +264,7 @@ export default function PicturePhrase() {
           <label className="font-semibold">Upload Image</label>
           <input
             type="file"
+            accept=".jpg, .jpeg, .png"
             onChange={(e) => {
               resetValues();
               handleImageUpload(e);
