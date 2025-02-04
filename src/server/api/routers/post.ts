@@ -1,9 +1,7 @@
 import { z } from "zod";
-
 import {
   createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
+  publicProcedure, // Keep this as publicProcedure
 } from "@/server/api/trpc";
 
 export const postRouter = createTRPCRouter({
@@ -15,27 +13,27 @@ export const postRouter = createTRPCRouter({
       };
     }),
 
-  create: protectedProcedure
+  create: publicProcedure // Use publicProcedure temporarily
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.post.create({
         data: {
           name: input.name,
-          createdBy: { connect: { id: ctx.session.user.id } },
+          // Temporarily mock the `createdBy` field with a hardcoded user ID
+          createdBy: { connect: { id: "mocked-user-id" } },
         },
       });
     }),
 
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
+  getLatest: publicProcedure.query(async ({ ctx }) => {
     const post = await ctx.db.post.findFirst({
       orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
     });
 
     return post ?? null;
   }),
 
-  getSecretMessage: protectedProcedure.query(() => {
+  getSecretMessage: publicProcedure.query(() => {
     return "you can now see this secret message!";
   }),
 });
