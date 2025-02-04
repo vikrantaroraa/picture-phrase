@@ -269,7 +269,7 @@ export default function PicturePhrase() {
           <label className="font-semibold">Upload Image</label>
           <input
             type="file"
-            accept=".jpg, .jpeg, .png"
+            accept=".jpg, .jpeg, .png, .webp"
             onChange={(e) => {
               resetValues();
               handleImageUpload(e);
