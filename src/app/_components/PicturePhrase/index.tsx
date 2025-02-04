@@ -235,6 +235,18 @@ export default function PicturePhrase() {
     };
   };
 
+  const resetValues = () => {
+    setOriginalImage(null);
+    setProcessedImage(null);
+    setText("Your Text Here");
+    setTextSettings({
+      size: 30,
+      color: "#FFFFFF",
+      top: 50,
+      left: 50,
+    });
+  };
+
   return (
     <div className="flex flex-col items-center p-6">
       <h1 className="mb-6 text-3xl font-semibold">
@@ -285,7 +297,10 @@ export default function PicturePhrase() {
           <label className="font-semibold">Upload Image</label>
           <input
             type="file"
-            onChange={handleImageUpload}
+            onChange={(e) => {
+              resetValues();
+              handleImageUpload(e);
+            }}
             className="mt-2 block w-full rounded border p-2"
           />
           <label className="font-semibold">Text</label>
