@@ -276,6 +276,11 @@ export default function PicturePhrase() {
             }}
             className="mt-2 block w-full rounded border p-2"
           />
+          <div>
+            <strong>Note:-</strong> Please wait a couple of seconds after
+            uploading the image to allow the app to process and put the text
+            behind the image ( Image formats allowed .jpg, .png, .jpeg, .webp ).
+          </div>
           <label className="font-semibold">Text</label>
           <textarea
             value={text}
