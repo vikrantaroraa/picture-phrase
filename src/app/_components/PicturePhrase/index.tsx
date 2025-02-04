@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import html2canvas from "html2canvas";
 import { removeBackground } from "@imgly/background-removal";
 import Image from "next/image";
 
