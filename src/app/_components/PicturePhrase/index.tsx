@@ -4,6 +4,62 @@ import html2canvas from "html2canvas";
 import { removeBackground } from "@imgly/background-removal";
 import Image from "next/image";
 
+import {
+  Merriweather,
+  Pacifico,
+  Abril_Fatface,
+  Permanent_Marker,
+  Caveat,
+  Shadows_Into_Light,
+  Comfortaa,
+  Lobster,
+  Indie_Flower,
+  Righteous,
+  Bebas_Neue,
+  Great_Vibes,
+  Press_Start_2P,
+  Fredoka,
+  Sacramento,
+} from "next/font/google";
+
+// Initialize fonts
+const merriweather = Merriweather({ weight: "400", subsets: ["latin"] });
+const pacifico = Pacifico({ weight: "400", subsets: ["latin"] });
+const abrilFatface = Abril_Fatface({ weight: "400", subsets: ["latin"] });
+const permanentMarker = Permanent_Marker({ weight: "400", subsets: ["latin"] });
+const caveat = Caveat({ subsets: ["latin"] });
+const shadowsIntoLight = Shadows_Into_Light({
+  weight: "400",
+  subsets: ["latin"],
+});
+const comfortaa = Comfortaa({ subsets: ["latin"] });
+const lobster = Lobster({ weight: "400", subsets: ["latin"] });
+const indieFlower = Indie_Flower({ weight: "400", subsets: ["latin"] });
+const righteous = Righteous({ weight: "400", subsets: ["latin"] });
+const bebasNeue = Bebas_Neue({ weight: "400", subsets: ["latin"] });
+const greatVibes = Great_Vibes({ weight: "400", subsets: ["latin"] });
+const pressStart2P = Press_Start_2P({ weight: "400", subsets: ["latin"] });
+const fredoka = Fredoka({ subsets: ["latin"] });
+const sacramento = Sacramento({ weight: "400", subsets: ["latin"] });
+
+const fontOptions = [
+  { name: "Merriweather", font: merriweather }, // Elegant serif
+  { name: "Pacifico", font: pacifico }, // Playful script
+  { name: "Abril Fatface", font: abrilFatface }, // Bold display
+  { name: "Permanent Marker", font: permanentMarker }, // Marker/handwritten
+  { name: "Caveat", font: caveat }, // Casual handwriting
+  { name: "Shadows Into Light", font: shadowsIntoLight }, // Light handwriting
+  { name: "Comfortaa", font: comfortaa }, // Round geometric
+  { name: "Lobster", font: lobster }, // Thick script
+  { name: "Indie Flower", font: indieFlower }, // Casual handwritten
+  { name: "Righteous", font: righteous }, // Retro futuristic
+  { name: "Bebas Neue", font: bebasNeue }, // Tall condensed
+  { name: "Great Vibes", font: greatVibes }, // Elegant script
+  { name: "Press Start 2P", font: pressStart2P }, // 8-bit pixel
+  { name: "Fredoka", font: fredoka }, // Friendly rounded
+  { name: "Sacramento", font: sacramento }, // Delicate script
+];
+
 export default function PicturePhrase() {
   const [originalImage, setOriginalImage] = useState(null);
   const [processedImage, setProcessedImage] = useState(null);
@@ -14,6 +70,7 @@ export default function PicturePhrase() {
     top: 50,
     left: 50,
     opacity: 100, // Add opacity setting
+    fontFamily: fontOptions[0]!.name,
   });
   const [imageDimensions, setImageDimensions] = useState({
     width: 600,
@@ -264,6 +321,12 @@ export default function PicturePhrase() {
 
       const scaledFontSize = textSettings.size * scaleFactor;
 
+      // Update font string to include the selected font family
+      const selectedFont = fontOptions.find(
+        (f) => f.name === textSettings.fontFamily,
+      );
+      ctx.font = `${scaledFontSize}px ${selectedFont ? selectedFont.name : "Arial"}`;
+
       ctx.font = `${scaledFontSize}px Arial`;
       ctx.fillStyle = textSettings.color;
       ctx.globalAlpha = textSettings.opacity / 100; // Add opacity to canvas
@@ -312,8 +375,13 @@ export default function PicturePhrase() {
       top: 50,
       left: 50,
       opacity: 100,
+      fontFamily: fontOptions[0]!.name,
     });
   };
+
+  // Get the current font object for the text preview
+  const currentFont =
+    fontOptions.find((f) => f.name === textSettings.fontFamily)?.font || inter;
 
   return (
     <div className="flex flex-col items-center p-6">
@@ -346,6 +414,7 @@ export default function PicturePhrase() {
               fontSize: `${textSettings.size}px`,
               color: textSettings.color,
               opacity: textSettings.opacity / 100,
+              fontFamily: currentFont.style.fontFamily,
             }}
             className="absolute z-0 -translate-x-1/2 -translate-y-1/2 transform whitespace-pre-wrap text-center"
           >
@@ -378,6 +447,24 @@ export default function PicturePhrase() {
             onChange={(e) => setText(e.target.value)}
             className="mt-2 block h-20 w-full resize-none rounded border p-2"
           />
+          <label className="font-semibold">Font Family</label>
+          <select
+            value={textSettings.fontFamily}
+            onChange={(e) =>
+              handleTextSettingChange("fontFamily", e.target.value)
+            }
+            className="mt-2 block w-full rounded border p-2"
+          >
+            {fontOptions.map((font) => (
+              <option
+                key={font.name}
+                value={font.name}
+                style={{ fontFamily: font.font.style.fontFamily }}
+              >
+                {font.name}
+              </option>
+            ))}
+          </select>
           <label className="font-semibold">Font Size</label>
           <input
             type="range"
