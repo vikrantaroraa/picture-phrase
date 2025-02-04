@@ -13,6 +13,7 @@ export default function PicturePhrase() {
     color: "#FFFFFF",
     top: 50,
     left: 50,
+    opacity: 100, // Add opacity setting
   });
   const [imageDimensions, setImageDimensions] = useState({
     width: 600,
@@ -169,6 +170,71 @@ export default function PicturePhrase() {
   //   };
   // };
 
+  // const handleDownload = async () => {
+  //   const offscreenCanvas = document.createElement("canvas");
+  //   offscreenCanvas.width = imageDimensions.width;
+  //   offscreenCanvas.height = imageDimensions.height;
+  //   const ctx = offscreenCanvas.getContext("2d");
+
+  //   const previewElement = document.getElementById("preview");
+  //   const previewWidth = previewElement.offsetWidth;
+  //   const previewHeight = previewElement.offsetHeight;
+
+  //   const scaleFactor = Math.max(
+  //     imageDimensions.width / previewWidth,
+  //     imageDimensions.height / previewHeight,
+  //   );
+
+  //   const originalImageElement = new window.Image();
+  //   originalImageElement.src = originalImage;
+
+  //   originalImageElement.onload = () => {
+  //     ctx.drawImage(
+  //       originalImageElement,
+  //       0,
+  //       0,
+  //       imageDimensions.width,
+  //       imageDimensions.height,
+  //     );
+
+  //     // Scale font size based on preview-to-actual ratio
+  //     const scaledFontSize = textSettings.size * scaleFactor;
+
+  //     ctx.font = `${scaledFontSize}px Arial`;
+  //     ctx.fillStyle = textSettings.color;
+  //     ctx.textBaseline = "middle";
+  //     ctx.textAlign = "center";
+
+  //     const xPosition = (imageDimensions.width * textSettings.left) / 100;
+  //     const yPosition = (imageDimensions.height * textSettings.top) / 100;
+
+  //     ctx.fillText(text, xPosition, yPosition);
+
+  //     if (processedImage) {
+  //       const processedImageElement = new window.Image();
+  //       processedImageElement.src = processedImage;
+  //       processedImageElement.onload = () => {
+  //         ctx.drawImage(
+  //           processedImageElement,
+  //           0,
+  //           0,
+  //           imageDimensions.width,
+  //           imageDimensions.height,
+  //         );
+
+  //         const link = document.createElement("a");
+  //         link.href = offscreenCanvas.toDataURL("image/png");
+  //         link.download = "customized-image.png";
+  //         link.click();
+  //       };
+  //     } else {
+  //       const link = document.createElement("a");
+  //       link.href = offscreenCanvas.toDataURL("image/png");
+  //       link.download = "customized-image.png";
+  //       link.click();
+  //     }
+  //   };
+  // };
   const handleDownload = async () => {
     const offscreenCanvas = document.createElement("canvas");
     offscreenCanvas.width = imageDimensions.width;
@@ -196,11 +262,11 @@ export default function PicturePhrase() {
         imageDimensions.height,
       );
 
-      // Scale font size based on preview-to-actual ratio
       const scaledFontSize = textSettings.size * scaleFactor;
 
       ctx.font = `${scaledFontSize}px Arial`;
       ctx.fillStyle = textSettings.color;
+      ctx.globalAlpha = textSettings.opacity / 100; // Add opacity to canvas
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
@@ -208,6 +274,7 @@ export default function PicturePhrase() {
       const yPosition = (imageDimensions.height * textSettings.top) / 100;
 
       ctx.fillText(text, xPosition, yPosition);
+      ctx.globalAlpha = 1; // Reset opacity for next draw
 
       if (processedImage) {
         const processedImageElement = new window.Image();
@@ -244,6 +311,7 @@ export default function PicturePhrase() {
       color: "#FFFFFF",
       top: 50,
       left: 50,
+      opacity: 100,
     });
   };
 
@@ -277,6 +345,7 @@ export default function PicturePhrase() {
               left: `${textSettings.left}%`,
               fontSize: `${textSettings.size}px`,
               color: textSettings.color,
+              opacity: textSettings.opacity / 100,
             }}
             className="absolute z-0 -translate-x-1/2 -translate-y-1/2 transform whitespace-pre-wrap text-center"
           >
@@ -342,6 +411,15 @@ export default function PicturePhrase() {
             max="100"
             value={textSettings.left}
             onChange={(e) => handleTextSettingChange("left", e.target.value)}
+            className="mt-2 w-full"
+          />
+          <label className="font-semibold">Text Opacity (%)</label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={textSettings.opacity}
+            onChange={(e) => handleTextSettingChange("opacity", e.target.value)}
             className="mt-2 w-full"
           />
           <button
