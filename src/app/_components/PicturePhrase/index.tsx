@@ -106,17 +106,88 @@ export default function PicturePhrase() {
   //   };
   // };
 
+  // const handleDownload = async () => {
+  //   const offscreenCanvas = document.createElement("canvas");
+  //   offscreenCanvas.width = imageDimensions.width;
+  //   offscreenCanvas.height = imageDimensions.height;
+  //   const ctx = offscreenCanvas.getContext("2d");
+
+  //   const originalImageElement = new window.Image();
+  //   originalImageElement.src = originalImage;
+
+  //   originalImageElement.onload = () => {
+  //     // Draw the original image first (bottom layer)
+  //     ctx.drawImage(
+  //       originalImageElement,
+  //       0,
+  //       0,
+  //       imageDimensions.width,
+  //       imageDimensions.height,
+  //     );
+
+  //     // Precise text positioning calculations
+  //     const xPosition = (imageDimensions.width * textSettings.left) / 100;
+  //     const yPosition = (imageDimensions.height * textSettings.top) / 100;
+
+  //     // Add text on top of original image (middle layer)
+  //     ctx.font = `${textSettings.size}px Arial`;
+  //     ctx.fillStyle = textSettings.color;
+  //     ctx.textBaseline = "middle"; // Align vertically
+  //     ctx.textAlign = "center"; // Align horizontally
+
+  //     // Measure text width to center precisely
+  //     const textWidth = ctx.measureText(text).width;
+
+  //     ctx.fillText(text, xPosition, yPosition);
+
+  //     // If processed image exists, draw it last (top layer)
+  //     if (processedImage) {
+  //       const processedImageElement = new window.Image();
+  //       processedImageElement.src = processedImage;
+  //       processedImageElement.onload = () => {
+  //         ctx.drawImage(
+  //           processedImageElement,
+  //           0,
+  //           0,
+  //           imageDimensions.width,
+  //           imageDimensions.height,
+  //         );
+
+  //         // Create download link
+  //         const link = document.createElement("a");
+  //         link.href = offscreenCanvas.toDataURL("image/png");
+  //         link.download = "customized-image.png";
+  //         link.click();
+  //       };
+  //     } else {
+  //       // Create download link if no processed image
+  //       const link = document.createElement("a");
+  //       link.href = offscreenCanvas.toDataURL("image/png");
+  //       link.download = "customized-image.png";
+  //       link.click();
+  //     }
+  //   };
+  // };
+
   const handleDownload = async () => {
     const offscreenCanvas = document.createElement("canvas");
     offscreenCanvas.width = imageDimensions.width;
     offscreenCanvas.height = imageDimensions.height;
     const ctx = offscreenCanvas.getContext("2d");
 
+    const previewElement = document.getElementById("preview");
+    const previewWidth = previewElement.offsetWidth;
+    const previewHeight = previewElement.offsetHeight;
+
+    const scaleFactor = Math.max(
+      imageDimensions.width / previewWidth,
+      imageDimensions.height / previewHeight,
+    );
+
     const originalImageElement = new window.Image();
     originalImageElement.src = originalImage;
 
     originalImageElement.onload = () => {
-      // Draw the original image first (bottom layer)
       ctx.drawImage(
         originalImageElement,
         0,
@@ -125,22 +196,19 @@ export default function PicturePhrase() {
         imageDimensions.height,
       );
 
-      // Precise text positioning calculations
+      // Scale font size based on preview-to-actual ratio
+      const scaledFontSize = textSettings.size * scaleFactor;
+
+      ctx.font = `${scaledFontSize}px Arial`;
+      ctx.fillStyle = textSettings.color;
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+
       const xPosition = (imageDimensions.width * textSettings.left) / 100;
       const yPosition = (imageDimensions.height * textSettings.top) / 100;
 
-      // Add text on top of original image (middle layer)
-      ctx.font = `${textSettings.size}px Arial`;
-      ctx.fillStyle = textSettings.color;
-      ctx.textBaseline = "middle"; // Align vertically
-      ctx.textAlign = "center"; // Align horizontally
-
-      // Measure text width to center precisely
-      const textWidth = ctx.measureText(text).width;
-
       ctx.fillText(text, xPosition, yPosition);
 
-      // If processed image exists, draw it last (top layer)
       if (processedImage) {
         const processedImageElement = new window.Image();
         processedImageElement.src = processedImage;
@@ -153,14 +221,12 @@ export default function PicturePhrase() {
             imageDimensions.height,
           );
 
-          // Create download link
           const link = document.createElement("a");
           link.href = offscreenCanvas.toDataURL("image/png");
           link.download = "customized-image.png";
           link.click();
         };
       } else {
-        // Create download link if no processed image
         const link = document.createElement("a");
         link.href = offscreenCanvas.toDataURL("image/png");
         link.download = "customized-image.png";
