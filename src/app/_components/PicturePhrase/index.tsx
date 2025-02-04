@@ -400,8 +400,8 @@ export default function PicturePhrase() {
 
   return (
     <div className="flex flex-col items-center p-6">
-      <h1 className="mb-6 text-3xl font-semibold">
-        PicturePhrase - Text Behind Image
+      <h1 className="mb-6 rounded-lg bg-black px-4 py-2 text-3xl font-semibold text-white">
+        Picture Phrase - Text Behind Image
       </h1>
 
       <div className="flex w-full max-w-6xl gap-10">
