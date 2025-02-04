@@ -76,8 +76,8 @@ const fontOptions = [
 ];
 
 export default function PicturePhrase() {
-  const [originalImage, setOriginalImage] = useState(null);
-  const [processedImage, setProcessedImage] = useState(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [text, setText] = useState("Your Text Here");
   const [textSettings, setTextSettings] = useState({
     size: 30,
@@ -92,8 +92,8 @@ export default function PicturePhrase() {
     height: 400,
   });
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setOriginalImage(imageUrl);
@@ -107,7 +107,7 @@ export default function PicturePhrase() {
     }
   };
 
-  const setupImage = async (imageUrl) => {
+  const setupImage = async (imageUrl: string) => {
     try {
       const imageBlob = await removeBackground(imageUrl);
       const url = URL.createObjectURL(imageBlob);
@@ -117,7 +117,10 @@ export default function PicturePhrase() {
     }
   };
 
-  const handleTextSettingChange = (field, value) => {
+  const handleTextSettingChange = (
+    field: keyof typeof textSettings,
+    value: string | number,
+  ) => {
     setTextSettings({ ...textSettings, [field]: value });
   };
 
@@ -127,7 +130,10 @@ export default function PicturePhrase() {
     offscreenCanvas.height = imageDimensions.height;
     const ctx = offscreenCanvas.getContext("2d");
 
+    if (!ctx) return; // Ensure canvas exists
+
     const previewElement = document.getElementById("preview");
+    if (!previewElement) return;
     const previewWidth = previewElement.offsetWidth;
     const previewHeight = previewElement.offsetHeight;
 
@@ -137,7 +143,7 @@ export default function PicturePhrase() {
     );
 
     const originalImageElement = new window.Image();
-    originalImageElement.src = originalImage;
+    originalImageElement.src = originalImage ?? "";
 
     originalImageElement.onload = async () => {
       ctx.drawImage(
@@ -154,7 +160,7 @@ export default function PicturePhrase() {
       const selectedFont = fontOptions.find(
         (f) => f.name === textSettings.fontFamily,
       );
-      const fontFamily = selectedFont.font.style.fontFamily;
+      const fontFamily = selectedFont?.font.style.fontFamily;
 
       ctx.font = `${scaledFontSize}px ${selectedFont ? fontFamily : "Arial"}`;
       ctx.fillStyle = textSettings.color;
@@ -210,7 +216,7 @@ export default function PicturePhrase() {
 
   // Get the current font object for the text preview
   const currentFont =
-    fontOptions.find((f) => f.name === textSettings.fontFamily)?.font || inter;
+    fontOptions.find((f) => f.name === textSettings.fontFamily)?.font ?? inter;
 
   return (
     <div className="flex flex-col items-center p-6">
